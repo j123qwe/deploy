@@ -4,9 +4,11 @@
 
 ##Variables
 DEBIAN_FRONTEND=noninteractive
-GITHUB=j123qwe #GitHub account to import SSH keys from
 
 ##Functions
+get_info(){
+	read -p "Enter GitHub username: " GITHUB #Get GitHub account to import SSH keys
+}
 
 update(){
 	sudo apt update
@@ -20,7 +22,12 @@ install(){
 		wireshark \
 		multitail \
 		lrzsz \
-		ssh-import-id
+		ssh-import-id \
+		nfs-common \
+		nmap \
+		inetutils-traceroute \
+		zip \
+		unzip
 }
 
 install_docker(){
@@ -34,7 +41,7 @@ install_docker(){
 	curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add - #Download Docker GPG key
 	sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" #Add Docker repository
 	sudo apt update #Refresh APT
-	sudo apt install docker-ce docker-ce-cli containerd.io #Install Docker
+	sudo apt install -y docker-ce docker-ce-cli containerd.io #Install Docker
 }
 
 config(){
@@ -42,7 +49,7 @@ config(){
 }
 
 ##Execute
-#update
-#install
-install_docker
-#config
+update
+install
+#install_docker
+config
