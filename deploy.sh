@@ -27,13 +27,13 @@ install(){
 		nmap \
 		inetutils-traceroute \
 		zip \
+		apt-transport-https \
 		unzip
 }
 
 install_docker(){
 	#Install required packages
 	sudo apt install -yq \
-		apt-transport-https \
 		ca-certificates \
 		curl \
 		gnupg-agent \
@@ -44,6 +44,13 @@ install_docker(){
 	sudo apt install -y docker-ce docker-ce-cli containerd.io #Install Docker
 }
 
+install_webmin(){
+	curl -fsSL http://www.webmin.com/jcameron-key.asc | sudo apt-key add - #Download Webmin GPG key
+	sudo add-apt-repository "deb https://download.webmin.com/download/repository sarge contrib" #Add Webmin repository
+	sudo apt update #Refresh APT
+	sudo apt install -y webmin
+}
+
 config(){
 	ssh-import-id-gh ${GITHUB} #Import SSH key(s) from GitHub
 }
@@ -52,4 +59,5 @@ config(){
 update
 install
 #install_docker
+#install_webmin
 config
