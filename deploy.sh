@@ -56,6 +56,7 @@ install_ssh(){
 		read -p "Enter GitHub username: " GITHUB #Get GitHub account to import SSH keys
 	done
 	ssh-import-id-gh ${GITHUB} #Import SSH key(s) from GitHub
+	unset GITHUB
 }
 
 show_menus() {
