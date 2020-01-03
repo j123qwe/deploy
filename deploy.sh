@@ -4,18 +4,17 @@
 
 ##Variables
 DEBIAN_FRONTEND=noninteractive
+RED='\e[0;41;30m'
+STD='\e[0;0;39m'
 
 ##Functions
-get_info(){
-	read -p "Enter GitHub username: " GITHUB #Get GitHub account to import SSH keys
-}
 
 update(){
 	sudo apt update
 	sudo apt upgrade -y
 }
 
-install(){
+install_utils(){
 	sudo apt install -yq \
 		htop \
 		tshark \
@@ -28,6 +27,7 @@ install(){
 		inetutils-traceroute \
 		zip \
 		apt-transport-https \
+		vim-scripts \
 		unzip
 }
 
@@ -51,13 +51,45 @@ install_webmin(){
 	sudo apt install -y webmin
 }
 
-config(){
+install_ssh(){
+	until [[ -n ${GITHUB} ]]; do
+		read -p "Enter GitHub username: " GITHUB #Get GitHub account to import SSH keys
+	done
 	ssh-import-id-gh ${GITHUB} #Import SSH key(s) from GitHub
 }
 
+show_menus() {
+	printf "\n\n"
+	echo -e "${RED}~~~~~~~~~~~~~~~~~~~~~"
+	echo -e " M A I N - M E N U   "
+	echo -e "~~~~~~~~~~~~~~~~~~~~~${STD}"
+	echo "1. Upgrade packages"
+	echo "2. Install utilities"
+	echo "3. Install SSH Keys from GitHub"
+	echo "4. Install Docker"
+	echo "5. Install Webmin"
+	echo "0. Exit"
+}
+
+read_options(){
+	local choice
+read -p "Enter choice: " choice
+	case $choice in
+		1) update ;;
+		2) install_utils ;;
+		3) install_ssh ;;
+		4) install_docker ;;
+		5) install_webmin ;;
+		0) exit 0;;
+		*) echo -e "Error..." && sleep 1
+	esac
+}
+
 ##Execute
-update
-install
-#install_docker
-#install_webmin
-config
+
+#Launch installation menu
+while true
+do
+	show_menus
+	read_options
+done
