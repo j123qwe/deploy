@@ -115,7 +115,8 @@ install_nfs_server(){
 	sudo mkdir -p ${NFSMOUNT}
 	sudo chown nobody:nogroup ${NFSMOUNT}
 	sudo chmod 777 ${NFSMOUNT}
-	echo "${NFSMOUNT} ${SUBNET}(rw,sync,no_subtree_check)" >> /etc/exports
+    echo "Adding the following to /etc/exports..."
+    echo "${NFSMOUNT} ${SUBNET}(rw,sync,no_subtree_check)" | sudo tee -a /etc/exports 
 	sudo exportfs -a
 	sudo systemctl restart nfs-kernel-server
 }
