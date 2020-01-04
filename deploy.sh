@@ -1,14 +1,30 @@
 #!/bin/bash
 
-##Begin installation of packages on Debian/Ubuntu systems
+## Begin installation of packages on Debian/Ubuntu systems
 
-##Variables
+## Variables
 DEBIAN_FRONTEND=noninteractive
 RED='\e[0;41;30m'
 STD='\e[0;0;39m'
 DTE=$(date +%Y%m%d%H%M%S)
 
-##Functions
+## Functions
+
+install_ssh(){
+	until [[ -n ${GITHUB} ]]; do
+		read -p "Enter GitHub username: " GITHUB #Get GitHub account to import SSH keys
+	done
+	sudo dpkg -s ssh-import-id | grep installed > /dev/null
+	if [ $? -eq 1 ]; then
+		sudo apt update && sudo apt -y install ssh-import-id
+	fi
+	ssh-import-id-gh ${GITHUB} #Import SSH key(s) from GitHub
+	unset GITHUB
+}
+
+set_timezone(){
+	sudo timedatectl set-timezone America/Chicago
+}
 
 install_dot(){
 	# Install VIM Tools if necessary
@@ -44,6 +60,7 @@ update(){
 install_utils(){
 	sudo apt install -yq \
 		htop \
+		whois \
 		tshark \
 		wireshark \
 		multitail \
@@ -58,15 +75,6 @@ install_utils(){
 		vim-scripts \
 		unzip
 }
-
-install_ssh(){
-	until [[ -n ${GITHUB} ]]; do
-		read -p "Enter GitHub username: " GITHUB #Get GitHub account to import SSH keys
-	done
-	ssh-import-id-gh ${GITHUB} #Import SSH key(s) from GitHub
-	unset GITHUB
-}
-
 
 install_docker(){
 	#Install required packages
@@ -102,7 +110,6 @@ install_kubernetes(){
 	sudo cp k8s/kubectl /etc/bash_completion.d/
 }
 
-
 install_nfs_server(){
 	until [[ -n ${NFSMOUNT} ]]; do
 		read -p "Enter directory name to create for NFS share: " NFSMOUNT
@@ -128,21 +135,20 @@ install_webmin(){
 	sudo apt install -y webmin
 }
 
-
-
 show_menus() {
 	printf "\n\n"
 	echo -e "${RED}~~~~~~~~~~~~~~~~~~~~~"
 	echo -e " M A I N - M E N U   "
 	echo -e "~~~~~~~~~~~~~~~~~~~~~${STD}"
-	echo "1. Install dotfiles"
-	echo "2. Upgrade packages"
-	echo "3. Install utilities"
-	echo "4. Install SSH Keys from GitHub"
-	echo "5. Install Docker"
-	echo "6. Install Kubernetes"
-	echo "7. Install NFS Server"
-	echo "8. Install Webmin"
+	echo "1. Install SSH Keys from GitHub"
+	echo "2. Set timezone to Central"
+	echo "3. Install dotfiles"
+	echo "4. Upgrade packages"
+	echo "5. Install utilities"
+	echo "6. Install Docker"
+	echo "7. Install Kubernetes"
+	echo "8. Install NFS Server"
+	echo "9. Install Webmin"
 	echo "0. Exit"
 }
 
@@ -150,20 +156,21 @@ read_options(){
 	local choice
 read -p "Enter choice: " choice
 	case $choice in
-		1) install_dot ;;
-		2) update ;;
-		3) install_utils ;;
-		4) install_ssh ;;
-		5) install_docker ;;
-		6) install_kubernetes ;;
-		7) install_nfs_server ;;
-		8) install_webmin ;;
+		1) install_ssh ;;
+		2) set_timezone ;;
+		3) install_dot ;;
+		4) update ;;
+		5) install_utils ;;
+		6) install_docker ;;
+		7) install_kubernetes ;;
+		8) install_nfs_server ;;
+		9) install_webmin ;;
 		0) exit 0;;
 		*) echo -e "Error..." && sleep 1
 	esac
 }
 
-##Execute
+## Execute
 
 #Launch installation menu
 while true
