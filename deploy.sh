@@ -21,6 +21,7 @@ install_utils(){
 		wireshark \
 		multitail \
 		lrzsz \
+		nload \
 		ssh-import-id \
 		nfs-common \
 		nmap \
