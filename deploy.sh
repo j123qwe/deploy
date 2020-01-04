@@ -6,8 +6,35 @@
 DEBIAN_FRONTEND=noninteractive
 RED='\e[0;41;30m'
 STD='\e[0;0;39m'
+DTE=$(date +%Y%m%d%H%M%S)
 
 ##Functions
+
+install_dot(){
+	# Install VIM Tools if necessary
+	dpkg -l | grep vim-scripts > /dev/null #Check to see if vim-scripts is installed
+	if [ $? != 0 ]; then
+		echo "vim-addon (vim-scripts) not installed, installing"
+		sudo apt update && sudo apt -y install vim-scripts
+	fi
+
+	# Install TMUX if necessary
+	dpkg -l | grep tmux > /dev/null #Check to see if tmux is installed
+	if [ $? != 0 ]; then
+		echo "tmux not installed, installing"
+		sudo apt update && sudo apt -y install tmux
+	fi
+
+	#Install DOT files
+	mkdir -p ~/.dotbackup
+	for DOTFILE in $(find dotfiles/. -maxdepth 1 -name "dot.*" -type f  -printf "%f\n" | sed 's/^dot//g'); do
+	    echo "Backing up ~/${DOTFILE} to ~/.dotbackup/${DOTFILE}.${DTE}.bak..."
+	    cp ~/${DOTFILE} ~/.dotbackup/${DOTFILE}.${DTE}.bak
+	    echo "Installing new file to  ~/${DOTFILE}..."
+	    cp dotfiles/dot${DOTFILE} ~/${DOTFILE}
+	done
+	printf "\n\nPlease type \e[1;31msource ~/.bashrc\e[0m to immediately activate new .bashrc settings.\n\n\n"
+}
 
 update(){
 	sudo apt update
@@ -60,19 +87,8 @@ install_kubernetes(){
 	sudo dpkg -s docker.io | grep installed > /dev/null
 	if [ $? -eq 1 ]; then
 		install_docker #Docker is not installed
-	else
-		#Docker is installed
 	fi
-	sudo cat > /etc/docker/daemon.json <<EOF
-{
-"exec-opts": ["native.cgroupdriver=systemd"],
-"log-driver": "json-file",
-"log-opts": {
-"max-size": "100m"
-},
-"storage-driver": "overlay2"
-}
-EOF
+	sudo cp k8s/daemon.json /etc/docker/
 	sudo mkdir -p /etc/systemd/system/docker.service.d
 	sudo systemctl daemon-reload
 	sudo systemctl restart docker
@@ -83,7 +99,7 @@ EOF
 	sudo apt install -y kubelet kubeadm kubectl nfs-common open-iscsi
 	sudo apt-mark hold kubelet kubeadm kubectl #Freezes updates for main K8S apps
 	sudo modprobe iscsi_tcp
-	sudo kubectl completion bash > /etc/bash_completion.d/kubectl 
+	sudo cp k8s/kubectl /etc/bash_completion.d/
 }
 
 
@@ -118,13 +134,14 @@ show_menus() {
 	echo -e "${RED}~~~~~~~~~~~~~~~~~~~~~"
 	echo -e " M A I N - M E N U   "
 	echo -e "~~~~~~~~~~~~~~~~~~~~~${STD}"
-	echo "1. Upgrade packages"
-	echo "2. Install utilities"
-	echo "3. Install SSH Keys from GitHub"
-	echo "4. Install Docker"
-	echo "5. Install Kubernetes"
-	echo "6. Install NFS Server"
-	echo "7. Install Webmin"
+	echo "1. Install dotfiles"
+	echo "2. Upgrade packages"
+	echo "3. Install utilities"
+	echo "4. Install SSH Keys from GitHub"
+	echo "5. Install Docker"
+	echo "6. Install Kubernetes"
+	echo "7. Install NFS Server"
+	echo "8. Install Webmin"
 	echo "0. Exit"
 }
 
@@ -132,13 +149,14 @@ read_options(){
 	local choice
 read -p "Enter choice: " choice
 	case $choice in
-		1) update ;;
-		2) install_utils ;;
-		3) install_ssh ;;
-		4) install_docker ;;
-		5) install_kubernetes ;;
-		6) install_nfs_server ;;
-		7) install_webmin ;;
+		1) install_dot ;;
+		2) update ;;
+		3) install_utils ;;
+		4) install_ssh ;;
+		5) install_docker ;;
+		6) install_kubernetes ;;
+		7) install_nfs_server ;;
+		8) install_webmin ;;
 		0) exit 0;;
 		*) echo -e "Error..." && sleep 1
 	esac
