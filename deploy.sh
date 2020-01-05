@@ -69,6 +69,7 @@ install_utils(){
 		ssh-import-id \
 		nfs-common \
 		nmap \
+		nfs-common \
 		inetutils-traceroute \
 		zip \
 		apt-transport-https \
