@@ -91,7 +91,7 @@ install_docker(){
 
 install_kubernetes(){
 	sudo swapoff -a #Disable swap
-	sudo sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab #Remove swap partition from fstab
+	sudo sed -i '/swap/d' /etc/fstab #Remove swap partition from fstab
 	sudo dpkg -s docker.io | grep installed > /dev/null
 	if [ $? -eq 1 ]; then
 		install_docker #Docker is not installed
