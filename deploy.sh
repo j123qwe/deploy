@@ -66,6 +66,7 @@ install_utils(){
 		multitail \
 		lrzsz \
 		nload \
+		bmon \
 		ssh-import-id \
 		nfs-common \
 		nmap \
