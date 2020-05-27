@@ -52,6 +52,11 @@ install_dot(){
 	printf "\n\nPlease type \e[1;31msource ~/.bashrc\e[0m to immediately activate new .bashrc settings.\n\n\n"
 }
 
+update_bash_history(){
+	#Add timestamp to BASH history
+	echo 'export HISTTIMEFORMAT="%c: "' >> ~/.bash_profile
+}
+
 update(){
 	sudo apt update
 	sudo apt upgrade -y
@@ -101,7 +106,7 @@ install_kubernetes(){
 	sudo mkdir -p /etc/systemd/system/docker.service.d
 	sudo systemctl daemon-reload
 	sudo systemctl restart docker
-	
+
 	sudo curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
 	sudo add-apt-repository "deb https://apt.kubernetes.io/ kubernetes-xenial main"
 	sudo apt update
@@ -117,14 +122,14 @@ install_nfs_server(){
 	done
 	until [[ -n ${SUBNET} ]]; do
 		read -p "Enter IP subnet to allow access, e.g. 192.168.1.0/24: " SUBNET
-	done	
+	done
 	sudo apt update
 	sudo apt install -y nfs-kernel-server
 	sudo mkdir -p ${NFSMOUNT}
 	sudo chown nobody:nogroup ${NFSMOUNT}
 	sudo chmod 777 ${NFSMOUNT}
     echo "Adding the following to /etc/exports..."
-    echo "${NFSMOUNT} ${SUBNET}(rw,sync,no_subtree_check)" | sudo tee -a /etc/exports 
+    echo "${NFSMOUNT} ${SUBNET}(rw,sync,no_subtree_check)" | sudo tee -a /etc/exports
 	sudo exportfs -a
 	sudo systemctl restart nfs-kernel-server
 }
@@ -144,12 +149,13 @@ show_menus() {
 	echo "1. Install SSH Keys from GitHub"
 	echo "2. Set timezone to Central"
 	echo "3. Install dotfiles"
-	echo "4. Upgrade packages"
-	echo "5. Install utilities"
-	echo "6. Install Docker"
-	echo "7. Install Kubernetes"
-	echo "8. Install NFS Server"
-	echo "9. Install Webmin"
+	echo "4. Update BASH history"
+	echo "5. Upgrade packages"
+	echo "6. Install utilities"
+	echo "7. Install Docker"
+	echo "8. Install Kubernetes"
+	echo "9. Install NFS Server"
+	echo "10. Install Webmin"
 	echo "0. Exit"
 }
 
@@ -160,12 +166,13 @@ read -p "Enter choice: " choice
 		1) install_ssh ;;
 		2) set_timezone ;;
 		3) install_dot ;;
-		4) update ;;
-		5) install_utils ;;
-		6) install_docker ;;
-		7) install_kubernetes ;;
-		8) install_nfs_server ;;
-		9) install_webmin ;;
+		4) update_bash_history ;;
+		5) update ;;
+		6) install_utils ;;
+		7) install_docker ;;
+		8) install_kubernetes ;;
+		9) install_nfs_server ;;
+		10) install_webmin ;;
 		0) exit 0;;
 		*) echo -e "Error..." && sleep 1
 	esac
