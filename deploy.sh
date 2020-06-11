@@ -52,11 +52,6 @@ install_dot(){
 	printf "\n\nPlease type \e[1;31msource ~/.bashrc\e[0m to immediately activate new .bashrc settings.\n\n\n"
 }
 
-update_bash_history(){
-	#Add timestamp to BASH history
-	echo 'export HISTTIMEFORMAT="%c: "' >> ~/.bash_profile
-}
-
 update(){
 	sudo apt update
 	sudo apt upgrade -y
@@ -149,13 +144,12 @@ show_menus() {
 	echo "1. Install SSH Keys from GitHub"
 	echo "2. Set timezone to Central"
 	echo "3. Install dotfiles"
-	echo "4. Update BASH history"
-	echo "5. Upgrade packages"
-	echo "6. Install utilities"
-	echo "7. Install Docker"
-	echo "8. Install Kubernetes"
-	echo "9. Install NFS Server"
-	echo "10. Install Webmin"
+	echo "4. Upgrade packages"
+	echo "5. Install utilities"
+	echo "6. Install Docker"
+	echo "7. Install Kubernetes"
+	echo "8. Install NFS Server"
+	echo "9. Install Webmin"
 	echo "0. Exit"
 }
 
@@ -166,13 +160,12 @@ read -p "Enter choice: " choice
 		1) install_ssh ;;
 		2) set_timezone ;;
 		3) install_dot ;;
-		4) update_bash_history ;;
-		5) update ;;
-		6) install_utils ;;
-		7) install_docker ;;
-		8) install_kubernetes ;;
-		9) install_nfs_server ;;
-		10) install_webmin ;;
+		4) update ;;
+		5) install_utils ;;
+		6) install_docker ;;
+		7) install_kubernetes ;;
+		8) install_nfs_server ;;
+		9) install_webmin ;;
 		0) exit 0;;
 		*) echo -e "Error..." && sleep 1
 	esac
