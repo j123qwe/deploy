@@ -74,7 +74,8 @@ install_utils(){
 		zip \
 		apt-transport-https \
 		vim-scripts \
-		unzip
+		unzip \
+		zsh
 }
 
 install_docker(){
@@ -136,6 +137,24 @@ install_webmin(){
 	sudo apt install -y webmin
 }
 
+install_ohmyzsh(){
+	#Download requirements
+	sudo apt install -yq zsh
+	sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+	git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
+	#Copy DOT Files
+	mkdir -p ~/.dotbackup
+	for DOTFILE in $(find dotfiles/. -maxdepth 1 -name "zshdot.*" -type f  -printf "%f\n" | sed 's/^zshdot//g'); do
+	    echo "Backing up ~/${DOTFILE} to ~/.dotbackup/${DOTFILE}.${DTE}.bak..."
+	    cp ~/${DOTFILE} ~/.dotbackup/${DOTFILE}.${DTE}.bak 2>/dev/null
+	    echo "Installing new file to  ~/${DOTFILE}..."
+	    cp dotfiles/zshdot${DOTFILE} ~/${DOTFILE}
+		chown ${USER}:${USER} ~/${DOTFILE}
+	done
+	sed -i 's/USERNAME/'${USER}'/g' ~/.zshrc
+	chsh -s /usr/bin/zsh
+}
+
 show_menus() {
 	printf "\n\n"
 	echo -e "${RED}~~~~~~~~~~~~~~~~~~~~~"
@@ -150,6 +169,7 @@ show_menus() {
 	echo "7. Install Kubernetes"
 	echo "8. Install NFS Server"
 	echo "9. Install Webmin"
+	echo "10. Install OhMyZsh and Powerlevel10k"
 	echo "0. Exit"
 }
 
@@ -166,6 +186,7 @@ read -p "Enter choice: " choice
 		7) install_kubernetes ;;
 		8) install_nfs_server ;;
 		9) install_webmin ;;
+		10) install_ohmyzsh ;;
 		0) exit 0;;
 		*) echo -e "Error..." && sleep 1
 	esac
